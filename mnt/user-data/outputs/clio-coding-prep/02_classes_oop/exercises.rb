@@ -18,7 +18,7 @@
 #   - to_s             — returns "Account balance: $X"
 
 class BankAccount
-  # your code here
+  def initialise  # your code here
 end
 
 account = BankAccount.new
