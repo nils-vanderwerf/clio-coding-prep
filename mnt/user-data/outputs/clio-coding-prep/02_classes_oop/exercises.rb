@@ -18,7 +18,33 @@
 #   - to_s             — returns "Account balance: $X"
 
 class BankAccount
-  def initialise  # your code here
+  attr_reader :balance
+
+  def initialize  # your code here
+    @balance = 0 
+  end
+
+  def deposit(amount)
+    return if zero_or_negative?(amount)
+    @balance += amount
+  end
+
+  def withdraw(amount)
+    return if zero_or_negative?(amount)
+    return "insufficient funds" if @balance - amount < 0 
+    @balance -= amount
+  end
+
+  def to_s
+    "Account balance: $#{@balance}"
+  end
+
+  private
+
+  def zero_or_negative?(amount)
+    amount <= 0
+  end
+
 end
 
 account = BankAccount.new
