@@ -68,7 +68,9 @@ end
 # => {1=>"b", 2=>"c"}  (last key wins for duplicate values)
 
 def invert_hash(hash)
-  hash.each_with_object({}) do |hash,res
+  hash.each_with_object({}) do |(k, v),result|
+    result[v] = k
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -98,24 +100,41 @@ end
 require 'date'
 
 def dashboard_summary(matters)
-  # your code here
+  {
+    total: matters.count,
+    open: matters.select { |m| m.status == "Open"},
+    overdue: matters.select { |m| m[:due_date] < Date.today && m[:status] != "Closed"},
+    by_type: 
+      matters.each_with_object(Hash.new(0)) do |m, counts|
+        counts[m[:matter_type]] += 1
+      end
+  }
 end
 
 # ─────────────────────────────────────────────
-# Exercise A — Group By Length
+# Exercise A — Group By Score Range
 # ─────────────────────────────────────────────
-# Group words by their character length.
+# Given an array of integers (scores 0–100), group them into:
+#   "low"    => scores < 50
+#   "medium" => scores 50–74
+#   "high"   => scores >= 75
 #
-# group_by_length(["hi", "hey", "ok", "bye", "yo"])
-# => {2=>["hi", "ok", "yo"], 3=>["hey", "bye"]}
+# group_by_score([30, 55, 80, 20, 75, 49])
+# => { "low" => [30, 20, 49], "medium" => [55], "high" => [80, 75] }
 #
-# group_by_length([])
+# group_by_score([])
 # => {}
 
-def group_by_length(words)
-  # your code here
-end
-
+  def group_by_score(scores)
+    scores.each_with_object({}) do |score, result|
+      key = if score < 50 then "low"
+            elsif score < 75 then "medium"
+            else "high"
+            end
+      result[key] ||= []
+      result[key] << score
+    end
+  end
 # ─────────────────────────────────────────────
 # Exercise B — Group By Even/Odd
 # ─────────────────────────────────────────────
@@ -128,9 +147,16 @@ end
 # => {}
 
 def group_even_odd(numbers)
-  # your code here
+  numbers.each_with_object({}) do |num, result|
+    odd_or_even = if num.even?
+                    "even"
+                  else
+                    "odd"
+                  end
+    result[odd_or_even] ||= []
+    result[odd_or_even] << num
+  end
 end
-
 # ─────────────────────────────────────────────
 # Exercise C — Group By First Letter (manual)
 # ─────────────────────────────────────────────
@@ -144,7 +170,10 @@ end
 # => {}
 
 def group_by_first_letter_manual(words)
-  # your code here
+  words.each_with_object({}) do |word, result|
+    result[word[0]] ||= []
+    result[word[0]] << word
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -164,7 +193,9 @@ end
 # => {}
 
 def sum_by_category(records)
-  # your code here
+   records.each_with_object(Hash.new(0)) do |record, result|
+      result[record[:category]] += record[:amount]
+    end
 end
 
 # ─────────────────────────────────────────────
@@ -181,9 +212,13 @@ end
 # => [1, 2]
 
 def two_sum(arr, target)
-  # your code here
+  seen = {}
+  arr.each_with_index do |num, index|
+    compliment = target - num
+    return [seen[compliment], index] if seen.key?(compliment)
+    seen[num] = index
+  end
 end
-
 # ─────────────────────────────────────────────
 # Exercise F — Most Frequent Element
 # ─────────────────────────────────────────────
@@ -197,7 +232,10 @@ end
 # => "a"
 
 def most_frequent(arr)
-  # your code here
+   counts = arr.each_with_object(Hash.new(0)) do |num, counts|
+    counts[num] += 1
+   end
+   counts.max_by { |key, value| value }[0]
 end
 
 # ─────────────────────────────────────────────
@@ -213,7 +251,9 @@ end
 # => {}
 
 def pairs_to_hash(pairs)
-  # your code here
+  pairs.each_with_object({}) do |(key, value), result|
+    result[key] = value
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -229,7 +269,10 @@ end
 # => []
 
 def unique_only(arr)
-  # your code here
+  counts = arr.each_with_object(Hash.new(0)) do |num, counts|
+    counts[num] += 1
+  end
+  counts.select {|key, value| value == 1}.keys
 end
 
 # ─────────────────────────────────────────────
@@ -244,7 +287,10 @@ end
 # => { "hi" => 2, "there" => 5 }
 
 def word_lengths(sentence)
-  # your code here
+  split_sentence = sentence.split
+  split_sentence.each_with_object({}) do |word, result|
+   result[word] = word.length
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -260,7 +306,12 @@ end
 # => []
 
 def anagram_groups(words)
-  # your code here
+  result = words.each_with_object({}) do |word, result|
+    key = word.chars.sort.join
+    result[key] ||= []
+    result[key] << word
+  end
+  result.values
 end
 
 # ─────────────────────────────────────────────
@@ -275,7 +326,11 @@ end
 # => []
 
 def running_total(arr)
-  # your code here
+  total = 0
+  arr.each_with_object([]) do |num, result|
+    total += num
+    result << total
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -291,7 +346,11 @@ end
 # => { a: 1 }
 
 def merge_sum(h1, h2)
-  # your code here
+  merged_array = h1.to_a + h2.to_a
+  merged_array.each_with_object({}) do |value, result|
+    result[value.first] ||= 0
+    result[value.first] = value.last 
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -306,5 +365,5 @@ end
 # => [1, 2, 3]
 
 def rotate_right(arr, k)
-  # your code here
+  arr.rotate(-k)
 end
