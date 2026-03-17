@@ -90,15 +90,66 @@ end
 # divide should raise ArgumentError if divisor is 0
 
 class Calculator
-  # implement after writing tests
+  def initialize
+  end
+
+  def add(n1, n2)
+    n1 + n2
+  end
+
+  def subtract(n1, n2)
+    n1 - n2
+  end
+
+  def multiply(n1, n2)
+    n1 * n2
+  end
+
+  def divide(n1, n2)
+    raise ArgumentError, "cannot divide by zero" if n2 == 0
+    n1 / n2
+  end
 end
 
 RSpec.describe Calculator do
   let(:calc) { Calculator.new }
 
-  # write tests for all four operations
-  # make sure to test the divide by zero case
-  # your tests here
+  describe '#add' do
+    context 'adding numbers together' do
+      it 'adds them correctly' do
+        expect(calc.add(2, 7)).to eq(9)
+      end
+    end
+  end
+
+  describe '#subtract' do
+    context 'subtracts numbers from one another' do
+      it 'subtracts them correctly' do
+        expect(calc.subtract(9, 3)).to eq(6)
+      end
+    end
+  end
+
+  describe '#multiply' do
+    context 'multiplies two numbers together' do
+      it 'multiplies them correctly' do
+        expect(calc.multiply(9, 3)).to eq(27)
+      end
+    end
+  end
+
+  describe '#divide' do
+    context 'when dividing by a number apart from zero' do
+      it 'raises an error' do
+        expect(calc.divide(6, 3)).to eq(2)
+      end
+    end
+    context 'when dividing by zero' do
+      it 'raises an error' do
+        expect{ calc.divide(5, 0) }.to raise_error(ArgumentError)
+      end
+    end
+  end
 end
 
 # ─────────────────────────────────────────────
