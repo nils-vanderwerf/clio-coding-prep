@@ -1,4 +1,6 @@
 require 'pry'
+require 'date'
+require_relative '../02_classes_oop/exercises'
 
 # Topic 3 — RSpec & Testing
 # Run with: rspec 03_rspec_testing/exercises_spec.rb
@@ -10,39 +12,6 @@ require 'pry'
 # ─────────────────────────────────────────────
 # Exercise 1 — Test BankAccount
 # ─────────────────────────────────────────────
-# Copy your BankAccount class here (or require it), then write full RSpec coverage.
-# You should have at least 8 tests covering all methods and edge cases.
-
-class BankAccount
-  def initialize  # your code here
-    @balance = 0 
-  end
-
-  def balance
-    @balance
-  end
-
-  def deposit(amount)
-    return if zero_or_negative?(amount)
-    @balance += amount
-  end
-
-  def withdraw(amount)
-    return if zero_or_negative?(amount)
-    return "insufficient funds" if @balance - amount < 0 
-    @balance -= amount
-  end
-
-  def to_s
-    "Account balance: $#{@balance}"
-  end
-
-  private
-
-  def zero_or_negative?(amount)
-    amount <= 0
-  end
-end
 
 RSpec.describe BankAccount do
   let(:account) { BankAccount.new }
@@ -69,7 +38,7 @@ RSpec.describe BankAccount do
       end
     end
     context "when a zero or negative deposit is entered" do
-      it 'ignores it and does dot throw an error' do
+      it 'ignores it and does not throw an error' do
         expect { account.deposit(-30) }.not_to raise_error
         expect { account.deposit(0) }.not_to raise_error
         expect(account.balance).to eq(0)
@@ -95,7 +64,7 @@ RSpec.describe BankAccount do
     end
 
     context "with invalid amounts" do
-      it 'ignores it and does dot throw an error' do
+      it 'ignores it and does not throw an error' do
         expect { account.withdraw(-30) }.not_to raise_error
         expect { account.withdraw(0) }.not_to raise_error
         expect(account.balance).to eq(0)
@@ -135,38 +104,6 @@ end
 # ─────────────────────────────────────────────
 # Exercise 3 — Test MatterTracker
 # ─────────────────────────────────────────────
-# Write RSpec for your MatterTracker class from Topic 2.
-# Focus on: adding matters, closing matters, overdue logic, edge cases
-
-require 'date'
-
-class MatterTracker
-  def initialize
-    @matters = []
-  end
-
-  def add(title, due_date)
-    @matters << {title: title, status: "Open", due_date: due_date}
-  end
-
-  def close(title)
-    matter = @matters.find {|m| m[:title] == title}
-    return "Matter not found" if matter.nil?
-    matter[:status] = "Closed"
-  end
-
-  def open_matters
-    @matters.select {|m| m[:status] == "Open"}
-  end
-
-  def overdue
-    @matters.select {|m| m[:due_date] < Date.today && m[:status] != "Closed"}
-  end
-
-  def count
-    @matters.count 
-  end
-end
 
 RSpec.describe MatterTracker do
   let(:tracker) { MatterTracker.new }
@@ -176,7 +113,7 @@ RSpec.describe MatterTracker do
   end
 
   describe "#add" do
-     it 'increases the count' do
+    it 'increases the count' do
       expect(tracker.count).to eq(1)
     end
 
@@ -206,7 +143,7 @@ RSpec.describe MatterTracker do
 
       it 'identifies it as an overdue matter' do
         expect(tracker.overdue.count).to eq(1)
-      end 
+      end
     end
 
     context 'when a matter is closed and past due' do
@@ -225,36 +162,6 @@ end
 # ─────────────────────────────────────────────
 # Exercise 4 — Test a Stack
 # ─────────────────────────────────────────────
-# Write comprehensive RSpec for your Stack class.
-# Pay attention to: order of operations, empty stack behaviour, peek vs pop
-
-class Stack
- def initialize
-  @stack = []
- end
-
- def push(item)
-  @stack << item
- end
-
- def peek
-  return nil if @stack.empty?
-  @stack.last
- end
-
- def pop
-  return nil if @stack.empty?
-  @stack.pop
- end
-
- def empty?
-  @stack.empty?
- end
-
- def size
-  @stack.size
- end
-end
 
 RSpec.describe Stack do
   let(:stack) { Stack.new }
@@ -263,31 +170,34 @@ RSpec.describe Stack do
     stack.push("second")
     stack.push("third")
   end
+
   describe '#push' do
     context 'when new items added to the stack' do
-      it 'puts them at the end' do
+      it 'increases the size' do
         expect(stack.size).to eq(3)
       end
     end
   end
+
   describe '#peek' do
     context 'when new items added to the stack' do
-       it 'does not remove the item' do
+      it 'does not remove the item' do
         stack.peek
         expect(stack.size).to eq(3)
       end
     end
   end
+
   describe '#pop' do
     context 'when items are popped from the list' do
-       it 'removes them from the end of the stack' do
+      it 'removes them from the end of the stack' do
         expect(stack.pop).to eq("third")
         expect(stack.size).to eq(2)
       end
     end
     context 'when stack is empty' do
-       it 'returns nil' do
-        stack.pop; stack.pop; stack.pop # run 3 times to empty it
+      it 'returns nil' do
+        stack.pop; stack.pop; stack.pop
         expect(stack.pop).to be_nil
       end
     end
@@ -304,7 +214,7 @@ RSpec.describe Stack do
     context 'when stack has items in it' do
       it 'returns false' do
         expect(stack.empty?).to be false
-       end
+      end
     end
   end
 
@@ -320,39 +230,104 @@ end
 # ─────────────────────────────────────────────
 # Exercise 5 — Test TimesheetEntry
 # ─────────────────────────────────────────────
-# Write RSpec for TimesheetEntry.
-# Use before blocks and multiple let values to set up different scenarios efficiently.
 
-# paste TimesheetEntry class here
+RSpec.describe TimesheetEntry do
+  let(:valid_entry)   { TimesheetEntry.new("Consultation", 2.0, 300.0) }
+  let(:invalid_entry) { TimesheetEntry.new("", 0, -50) }
 
-# RSpec.describe TimesheetEntry do
-#   let(:valid_entry)   { TimesheetEntry.new("Consultation", 2.0, 300.0) }
-#   let(:invalid_entry) { TimesheetEntry.new("", 0, -50) }
+  describe "#total" do
+    context 'when multiplying hours by rate per hour' do
+      it 'gives the correct total' do
+        expect(valid_entry.total).to eq(600.00)
+      end
+    end
+    context 'when result has more than 2 decimal places' do
+      it 'rounds to 2 decimal places' do
+        unrounded_entry = TimesheetEntry.new("Test", 2.0, 33.3333)
+        expect(unrounded_entry.total).to eq(66.67)
+      end
+    end
+  end
 
-#   describe "#total" do
-#     # your tests here — test rounding too
-#   end
+  describe "#billable?" do
+    context "when rate per hour and hours are both greater than zero" do
+      it "returns true on the timesheet being billable" do
+        expect(valid_entry.billable?).to be true
+      end
+    end
+    context "when rate per hour is below or equal to zero" do
+      let(:low_rate_entry) { TimesheetEntry.new("Test", 2.0, -300.0) }
+      
+      it "returns false on the timesheet being billable" do
+         expect(low_rate_entry.billable?).to be false
+      end
+    end
+    context "when hours are below or equal to zero" do
+      let(:low_hour_entry) { TimesheetEntry.new("Test", -2.0, 300.0) }
+      it "returns false on the timesheet being billable" do
+        expect(low_hour_entry.billable?).to be false
+      end
+    end
+  end
 
-#   describe "#valid?" do
-#     context "with a valid entry" do
-#       # your tests here
-#     end
+  describe "#valid?" do
+    context "with a valid entry" do
+      it 'returns true' do
+        expect(valid_entry.valid?).to be true
+      end
+    end
 
-#     context "with invalid description" do
-#       # your tests here
-#     end
+    context "with invalid description" do
+      it 'returns false' do
+        expect(invalid_entry.valid?).to be false
+      end
+    end
 
-#     context "with invalid hours" do
-#       # test boundaries: 0, 0.1, 24, 24.1
-#       # your tests here
-#     end
+    context "with invalid hours" do
+      let(:too_few_hours)      { TimesheetEntry.new("Test 1", 0.05, 300.0) }
+      let(:lower_boundary)     { TimesheetEntry.new("Test 2", 0.1, 300.0) }
+      let(:upper_boundary)     { TimesheetEntry.new("Test 3", 24, 300.0) }
+      let(:too_many_hours)     { TimesheetEntry.new("Test 4", 25, 300.0) }
 
-#     context "with invalid rate" do
-#       # your tests here
-#     end
-#   end
+      it 'returns false below minimum hours' do
+        expect(too_few_hours.valid?).to be false
+      end
 
-#   describe "#to_s" do
-#     # your tests here
-#   end
-# end
+      it 'returns true at lower boundary (0.1)' do
+        expect(lower_boundary.valid?).to be true
+      end
+
+      it 'returns true at upper boundary (24)' do
+        expect(upper_boundary.valid?).to be true
+      end
+
+      it 'returns false above maximum hours' do
+        expect(too_many_hours.valid?).to be false
+      end
+    end
+
+    context "with invalid rate" do
+     let(:invalid_rate_entry)     { TimesheetEntry.new("Invalid Rate Test", 1.0, -50.0) }
+     let(:zero_rate_entry) { TimesheetEntry.new("Zero Rate", 1.0, 0) }
+
+     it 'returns false if a negative rate is entered' do
+        expect(invalid_rate_entry.valid?).to be false
+      end
+
+      it 'returns false if rate is zero' do
+        expect(zero_rate_entry.valid?).to be false
+      end
+    end
+  end
+
+  describe "#to_s" do
+    context "when description, hours and rate per hour are entered correctly" do
+      let(:entry) { TimesheetEntry.new("Client consultation", 2.5, 350.0) }
+      let(:description) { "Client consultation: (2.5h @ $350.0/h) = $875.0"}
+
+      it "formats it as required" do
+        expect(entry.to_s).to eq(description)
+      end
+    end
+  end
+end

@@ -195,11 +195,11 @@ class Stack
  end
 end
 
-stack = Stack.new
+# stack = Stack.new
 # stack.push("first")
 # stack.push("second")
 # stack.push("third")
-puts stack.peek     # "third"
+# puts stack.peek     # "third"
 # puts stack.pop      # "third"
 # puts stack.pop      # "second"
 # puts stack.size     # 1
@@ -212,16 +212,38 @@ puts stack.peek     # "third"
 # Exercise 5 — TimesheetEntry
 # ─────────────────────────────────────────────
 # Clio-flavoured. Build a TimesheetEntry class for legal billing:
-#   - initialize(description, hours, rate_per_hour)
-#   - total         — returns hours * rate_per_hour, rounded to 2 decimal places
-#   - billable?     — returns true if hours > 0 and rate > 0
-#   - to_s          — returns "Description (Xh @ $Y/h) = $Z"
-#   - valid?        — returns true only if description is non-empty,
-#                     hours is between 0.1 and 24, rate is positive
+  # - initialize(description, hours, rate_per_hour)
+  # - total         — returns hours * rate_per_hour, rounded to 2 decimal places
+  # - billable?     — returns true if hours > 0 and rate > 0
+  # - to_s          — returns "Description (Xh @ $Y/h) = $Z"
+  # - valid?        — returns true only if description is non-empty,
+  #                   hours is between 0.1 and 24, rate is positive
 
-# class TimesheetEntry
-#   # your code here
-# end
+class TimesheetEntry
+  attr_reader :description
+  
+  def initialize(description, hours, rate_per_hour)
+    @description = description
+    @hours = hours 
+    @rate_per_hour = rate_per_hour
+  end
+
+  def total
+    (@hours * @rate_per_hour).round(2)
+  end
+
+  def billable?
+    @rate_per_hour > 0 && @hours > 0
+  end
+
+  def to_s 
+    "#{@description}: (#{@hours}h @ $#{@rate_per_hour}/h) = $#{total}"
+  end
+
+  def valid?
+    !@description.empty? && @hours.between?(0.1, 24) && @rate_per_hour > 0
+  end
+end
 
 # entry = TimesheetEntry.new("Client consultation", 2.5, 350.0)
 # puts entry.total      # 875.0
