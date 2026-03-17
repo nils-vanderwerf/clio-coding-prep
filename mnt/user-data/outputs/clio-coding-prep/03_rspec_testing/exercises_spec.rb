@@ -1,3 +1,5 @@
+require 'pry'
+
 # Topic 3 — RSpec & Testing
 # Run with: rspec 03_rspec_testing/exercises_spec.rb
 #
@@ -12,38 +14,102 @@
 # You should have at least 8 tests covering all methods and edge cases.
 
 class BankAccount
-  # paste your implementation here
+  def initialize  # your code here
+    @balance = 0 
+  end
+
+  def balance
+    @balance
+  end
+
+  def deposit(amount)
+    return if zero_or_negative?(amount)
+    @balance += amount
+  end
+
+  def withdraw(amount)
+    return if zero_or_negative?(amount)
+    return "insufficient funds" if @balance - amount < 0 
+    @balance -= amount
+  end
+
+  def to_s
+    "Account balance: $#{@balance}"
+  end
+
+  private
+
+  def zero_or_negative?(amount)
+    amount <= 0
+  end
 end
 
 RSpec.describe BankAccount do
   let(:account) { BankAccount.new }
 
   describe "#balance" do
-    # your tests here
+    context 'when a new account is opened' do
+      it 'returns 0 for the new account' do
+        expect(account.balance).to eq(0)
+      end
+    end
+    context 'after a deposit' do
+      it 'updates the balance' do
+        account.deposit(50)
+        expect(account.balance).to eq(50)
+      end
+    end
   end
 
   describe "#deposit" do
-    # your tests here
-    # think about: normal deposit, zero amount, negative amount
+    context "when a normal deposit is made" do
+      it 'increases the balance by that amount' do
+        account.deposit(50)
+        expect(account.balance).to eq(50)
+      end
+    end
+    context "when a zero or negative deposit is entered" do
+      it 'ignores it and does dot throw an error' do
+        expect { account.deposit(-30) }.not_to raise_error
+        expect { account.deposit(0) }.not_to raise_error
+        expect(account.balance).to eq(0)
+      end
+    end
   end
 
   describe "#withdraw" do
     context "when funds are sufficient" do
-      # your tests here
+      it 'withdraws that amount from the balance' do
+        account.deposit(100)
+        account.withdraw(30)
+        expect(account.balance).to eq(70)
+      end
     end
 
     context "when funds are insufficient" do
-      # your tests here
-      # think about: returns correct message AND doesn't change balance
+      it 'returns an insufficient funds message' do
+        account.deposit(100)
+        expect(account.withdraw(130)).to eq("insufficient funds")
+        expect(account.balance).to eq(100)
+      end
     end
 
     context "with invalid amounts" do
-      # your tests here
+      it 'ignores it and does dot throw an error' do
+        expect { account.withdraw(-30) }.not_to raise_error
+        expect { account.withdraw(0) }.not_to raise_error
+        expect(account.balance).to eq(0)
+      end
     end
   end
 
   describe "#to_s" do
-    # your tests here
+    context 'when user wants to display the balance' do
+      it 'returns a formatted string' do
+        account.balance(100)
+        expect(account.to_s).to eq("Account balance: $100")
+      end
+    end
   end
 end
 
@@ -74,29 +140,84 @@ end
 
 require 'date'
 
-# paste MatterTracker class here
+class MatterTracker
+  def initialize
+    @matters = []
+  end
+
+  def add(title, due_date)
+    @matters << {title: title, status: "Open", due_date: due_date}
+  end
+
+  def close(title)
+    matter = @matters.find {|m| m[:title] == title}
+    return "Matter not found" if matter.nil?
+    matter[:status] = "Closed"
+  end
+
+  def open_matters
+    @matters.select {|m| m[:status] == "Open"}
+  end
+
+  def overdue
+    @matters.select {|m| m[:due_date] < Date.today && m[:status] != "Closed"}
+  end
+
+  def count
+    @matters.count 
+  end
+end
 
 RSpec.describe MatterTracker do
   let(:tracker) { MatterTracker.new }
 
+  before do
+    tracker.add("Smith v Jones", Date.today + 10)
+  end
+
   describe "#add" do
-    # your tests here
+     it 'increases the count' do
+      expect(tracker.count).to eq(1)
+    end
+
+    it 'adds the matter as open' do
+      expect(tracker.open_matters.first[:title]).to eq("Smith v Jones")
+    end
   end
 
   describe "#close" do
     context "when matter exists" do
-      # your tests here
+      it 'closes an open matter' do
+        tracker.close("Smith v Jones")
+        expect(tracker.open_matters).to be_empty
+      end
     end
 
     context "when matter does not exist" do
-      # your tests here
+      it 'returns a message indicating the matter was not found' do
+        expect(tracker.close("Something random")).to eq("Matter not found")
+      end
     end
   end
 
   describe "#overdue" do
-    # this is the most important one to test well
-    # think about: past due open, past due closed, future due open
-    # your tests here
+    context 'when a matter is open and past due' do
+      before { tracker.add("Overdue Matter", Date.today - 10) }
+
+      it 'identifies it as an overdue matter' do
+        expect(tracker.overdue.count).to eq(1)
+      end 
+    end
+
+    context 'when a matter is closed and past due' do
+      before do
+        tracker.add("Old Closed Matter", Date.today - 10)
+        tracker.close("Old Closed Matter")
+      end
+
+      it 'does not include it in overdue' do
+        expect(tracker.overdue.count).to eq(0)
+      end
   end
 end
 
@@ -106,14 +227,50 @@ end
 # Write comprehensive RSpec for your Stack class.
 # Pay attention to: order of operations, empty stack behaviour, peek vs pop
 
-# paste Stack class here
+class Stack
+ def initialize
+  @stack = []
+ end
+
+ def push(item)
+  @stack << item
+ end
+
+ def peek
+  return nil if @stack.empty?
+  @stack.last
+ end
+
+ def pop
+  return nil if @stack.empty?
+  @stack.pop
+ end
+
+ def empty?
+  @stack.empty?
+ end
+
+ def size
+  @stack.size
+ end
+end
 
 RSpec.describe Stack do
   let(:stack) { Stack.new }
 
-  # your tests here
-  # make sure to test the LIFO (last in first out) behaviour explicitly
-  # test all edge cases for empty stack
+  describe '#push' do
+    before do
+      stack.push("first")
+      stack.push("second")
+      stack.push("third")
+    end
+
+    context 'when new items added to the stack' do
+      it 'puts them at the end' do
+        expect(stack.last).to eq("third")
+      end
+    end
+  end
 end
 
 # ─────────────────────────────────────────────
@@ -124,34 +281,34 @@ end
 
 # paste TimesheetEntry class here
 
-RSpec.describe TimesheetEntry do
-  let(:valid_entry)   { TimesheetEntry.new("Consultation", 2.0, 300.0) }
-  let(:invalid_entry) { TimesheetEntry.new("", 0, -50) }
+# RSpec.describe TimesheetEntry do
+#   let(:valid_entry)   { TimesheetEntry.new("Consultation", 2.0, 300.0) }
+#   let(:invalid_entry) { TimesheetEntry.new("", 0, -50) }
 
-  describe "#total" do
-    # your tests here — test rounding too
-  end
+#   describe "#total" do
+#     # your tests here — test rounding too
+#   end
 
-  describe "#valid?" do
-    context "with a valid entry" do
-      # your tests here
-    end
+#   describe "#valid?" do
+#     context "with a valid entry" do
+#       # your tests here
+#     end
 
-    context "with invalid description" do
-      # your tests here
-    end
+#     context "with invalid description" do
+#       # your tests here
+#     end
 
-    context "with invalid hours" do
-      # test boundaries: 0, 0.1, 24, 24.1
-      # your tests here
-    end
+#     context "with invalid hours" do
+#       # test boundaries: 0, 0.1, 24, 24.1
+#       # your tests here
+#     end
 
-    context "with invalid rate" do
-      # your tests here
-    end
-  end
+#     context "with invalid rate" do
+#       # your tests here
+#     end
+#   end
 
-  describe "#to_s" do
-    # your tests here
-  end
-end
+#   describe "#to_s" do
+#     # your tests here
+#   end
+# end

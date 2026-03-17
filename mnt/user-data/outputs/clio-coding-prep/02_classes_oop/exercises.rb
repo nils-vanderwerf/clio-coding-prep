@@ -18,10 +18,12 @@
 #   - to_s             — returns "Account balance: $X"
 
 class BankAccount
-  attr_reader :balance
-
   def initialize  # your code here
     @balance = 0 
+  end
+
+  def balance
+    @balance
   end
 
   def deposit(amount)
@@ -47,14 +49,14 @@ class BankAccount
 
 end
 
-account = BankAccount.new
-account.deposit(100)
-account.deposit(50)
-account.withdraw(30)
-puts account.balance        # 120
-puts account.withdraw(200)  # "insufficient funds"
-puts account.balance        # still 120
-puts account                # Account balance: $120
+# account = BankAccount.new
+# account.deposit(100)
+# account.deposit(50)
+# account.withdraw(30)
+# puts account.balance        # 120
+# puts account.withdraw(200)  # "insufficient funds"
+# puts account.balance        # still 120
+# puts account                # Account balance: $120
 
 # ─────────────────────────────────────────────
 # Exercise 2 — TodoList
@@ -68,18 +70,37 @@ puts account                # Account balance: $120
 #   - summary         — returns "X done, Y pending"
 
 class TodoList
-  # your code here
+  attr_accessor :pending, :completed
+
+  def initialize
+    @pending = []
+    @completed = []
+  end
+
+  def add(item)
+    @pending << item
+  end
+
+  def complete(item)
+    return unless @pending.include?(item)
+    @pending.delete(item)
+    @completed << item
+  end
+
+  def summary
+    "#{@completed.count} done, #{@pending.count} pending"
+  end
 end
 
-list = TodoList.new
-list.add("Buy milk")
-list.add("Walk dog")
-list.add("Write tests")
-list.complete("Buy milk")
-list.complete("nonexistent") # should not raise an error
-p list.pending    # ["Walk dog", "Write tests"]
-p list.completed  # ["Buy milk"]
-puts list.summary # "1 done, 2 pending"
+# list = TodoList.new
+# list.add("Buy milk")
+# list.add("Walk dog")
+# list.add("Write tests")
+# list.complete("Buy milk")
+# list.complete("nonexistent") # should not raise an error
+# p list.pending    # ["Walk dog", "Write tests"]
+# p list.completed  # ["Buy milk"]
+# puts list.summary # "1 done, 2 pending"
 
 # ─────────────────────────────────────────────
 # Exercise 3 — MatterTracker
@@ -96,19 +117,43 @@ puts list.summary # "1 done, 2 pending"
 require 'date'
 
 class MatterTracker
-  # your code here
+  def initialize
+    @matters = []
+  end
+
+  def add(title, due_date)
+    @matters << {title: title, status: "Open", due_date: due_date}
+  end
+
+  def close(title)
+    matter = @matters.find {|m| m[:title] == title}
+    return "Matter not found" if matter.nil?
+    matter[:status] = "Closed"
+  end
+
+  def open_matters
+    @matters.select {|m| m[:status] == "Open"}
+  end
+
+  def overdue
+    @matters.select {|m| m[:due_date] < Date.today && m[:status] != "Closed"}
+  end
+
+  def count
+    @matters.count 
+  end
 end
 
-tracker = MatterTracker.new
-tracker.add("Smith v Jones", Date.today - 5)
-tracker.add("Chen Lease", Date.today + 10)
-tracker.add("Ali Estate", Date.today - 2)
-tracker.close("Ali Estate")
+# tracker = MatterTracker.new
+# tracker.add("Smith v Jones", Date.today - 5)
+# tracker.add("Chen Lease", Date.today + 10)
+# tracker.add("Ali Estate", Date.today - 2)
+# tracker.close("Ali Estate")
 
-puts tracker.count           # 3
-p tracker.open_matters.map { |m| m[:title] }  # ["Smith v Jones", "Chen Lease"]
-p tracker.overdue.map { |m| m[:title] }       # ["Smith v Jones"]
-puts tracker.close("Nonexistent")              # "Matter not found"
+# puts tracker.count           # 3
+# p tracker.open_matters.map { |m| m[:title] }  # ["Smith v Jones", "Chen Lease"]
+# p tracker.overdue.map { |m| m[:title] }       # ["Smith v Jones"]
+# puts tracker.close("Nonexistent")              # "Matter not found"
 
 # ─────────────────────────────────────────────
 # Exercise 4 — Stack
@@ -123,21 +168,45 @@ puts tracker.close("Nonexistent")              # "Matter not found"
 #   - size        — returns number of items
 
 class Stack
-  # your code here
+ def initialize
+  @stack = []
+ end
+
+ def push(item)
+  @stack << item
+ end
+
+ def peek
+  return nil if @stack.empty?
+  @stack.last
+ end
+
+ def pop
+  return nil if @stack.empty?
+  @stack.pop
+ end
+
+ def empty?
+  @stack.empty?
+ end
+
+ def size
+  @stack.size
+ end
 end
 
 stack = Stack.new
-stack.push("first")
-stack.push("second")
-stack.push("third")
+# stack.push("first")
+# stack.push("second")
+# stack.push("third")
 puts stack.peek     # "third"
-puts stack.pop      # "third"
-puts stack.pop      # "second"
-puts stack.size     # 1
-puts stack.empty?   # false
-stack.pop
-puts stack.empty?   # true
-puts stack.pop.nil? # true
+# puts stack.pop      # "third"
+# puts stack.pop      # "second"
+# puts stack.size     # 1
+# puts stack.empty?   # false
+# stack.pop
+# puts stack.empty?   # true
+# puts stack.pop.nil? # true
 
 # ─────────────────────────────────────────────
 # Exercise 5 — TimesheetEntry
@@ -150,16 +219,16 @@ puts stack.pop.nil? # true
 #   - valid?        — returns true only if description is non-empty,
 #                     hours is between 0.1 and 24, rate is positive
 
-class TimesheetEntry
-  # your code here
-end
+# class TimesheetEntry
+#   # your code here
+# end
 
-entry = TimesheetEntry.new("Client consultation", 2.5, 350.0)
-puts entry.total      # 875.0
-puts entry.billable?  # true
-puts entry.valid?     # true
-puts entry            # Client consultation (2.5h @ $350.0/h) = $875.0
+# entry = TimesheetEntry.new("Client consultation", 2.5, 350.0)
+# puts entry.total      # 875.0
+# puts entry.billable?  # true
+# puts entry.valid?     # true
+# puts entry            # Client consultation (2.5h @ $350.0/h) = $875.0
 
-bad = TimesheetEntry.new("", 0, -50)
-puts bad.valid?       # false
-puts bad.billable?    # false
+# bad = TimesheetEntry.new("", 0, -50)
+# puts bad.valid?       # false
+# puts bad.billable?    # false
