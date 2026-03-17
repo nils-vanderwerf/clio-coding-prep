@@ -106,7 +106,7 @@ RSpec.describe BankAccount do
   describe "#to_s" do
     context 'when user wants to display the balance' do
       it 'returns a formatted string' do
-        account.balance(100)
+        account.deposit(100)
         expect(account.to_s).to eq("Account balance: $100")
       end
     end
@@ -218,6 +218,7 @@ RSpec.describe MatterTracker do
       it 'does not include it in overdue' do
         expect(tracker.overdue.count).to eq(0)
       end
+    end
   end
 end
 
@@ -257,17 +258,60 @@ end
 
 RSpec.describe Stack do
   let(:stack) { Stack.new }
-
+  before do
+    stack.push("first")
+    stack.push("second")
+    stack.push("third")
+  end
   describe '#push' do
-    before do
-      stack.push("first")
-      stack.push("second")
-      stack.push("third")
-    end
-
     context 'when new items added to the stack' do
       it 'puts them at the end' do
-        expect(stack.last).to eq("third")
+        expect(stack.size).to eq(3)
+      end
+    end
+  end
+  describe '#peek' do
+    context 'when new items added to the stack' do
+       it 'does not remove the item' do
+        stack.peek
+        expect(stack.size).to eq(3)
+      end
+    end
+  end
+  describe '#pop' do
+    context 'when items are popped from the list' do
+       it 'removes them from the end of the stack' do
+        expect(stack.pop).to eq("third")
+        expect(stack.size).to eq(2)
+      end
+    end
+    context 'when stack is empty' do
+       it 'returns nil' do
+        stack.pop; stack.pop; stack.pop # run 3 times to empty it
+        expect(stack.pop).to be_nil
+      end
+    end
+  end
+
+  describe '#empty?' do
+    let(:empty_stack) { Stack.new }
+
+    context 'when stack is empty' do
+      it 'returns true' do
+        expect(empty_stack.empty?).to be true
+      end
+    end
+    context 'when stack has items in it' do
+      it 'returns false' do
+        expect(stack.empty?).to be false
+       end
+    end
+  end
+
+  describe '#size' do
+    context 'when querying number of items in a stack' do
+      it 'returns the number of items' do
+        expect(stack.size).to eq(3)
       end
     end
   end
