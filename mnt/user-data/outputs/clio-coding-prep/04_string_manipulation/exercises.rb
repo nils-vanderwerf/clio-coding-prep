@@ -15,7 +15,8 @@
 # palindrome?("")                 # true
 
 def palindrome?(str)
-  # your code here
+  characters = str.downcase.gsub(" ", "").chars
+  characters == characters.reverse
 end
 
 # ─────────────────────────────────────────────
@@ -31,7 +32,8 @@ end
 # caesar("abc", 0)     # "abc"
 
 def caesar(str, n)
-  # your code here
+  alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  str.tr(alphabet, alphabet.chars.rotate(n).join)
 end
 
 # ─────────────────────────────────────────────
@@ -55,7 +57,7 @@ end
 # => ""
 
 def title_case(str)
-  # your code here
+  str.split.map(&:capitalize).join(" ")
 end
 
 # ─────────────────────────────────────────────
@@ -74,7 +76,7 @@ end
 # decode("3a2bc")       # "aaabbc"
 
 def encode(str)
-  # your code here
+  str.chars.chunk { |c| c }.map { |char, group| "#{group.length}#{char}" }.join
 end
 
 def decode(str)
@@ -103,5 +105,11 @@ end
 # Hint: consider using a regex OR split + validate each part
 
 def valid_matter_ref?(ref)
-  # your code here
+  return false if ref.nil?
+  parts = ref.split("-")
+  return false unless parts.length == 3
+  
+  parts[0].match?(/\A[A-Z]{2}\z/) &&
+  parts[1].match?(/\A[0-9]{4}\z/) &&
+  parts[2].match?(/\A[0-9]{3}\z/)
 end
