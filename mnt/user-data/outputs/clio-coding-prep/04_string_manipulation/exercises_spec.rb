@@ -70,3 +70,23 @@ describe "#caesar" do
     end
   end
 end
+
+describe "#most_frequent" do
+  context "when given an array with values in it" do
+    it "returns the most common element" do
+      expect(most_frequent(["a", "b", "c", "b", "e"])).to eq("b")
+    end
+  end
+
+  context "when given an empty array" do
+    it "returns nil" do
+      expect(most_frequent([])).to eq(nil)
+    end
+  end
+
+  context "when there is a tie" do
+    it "returns one of the tied elements" do
+      expect(most_frequent(["a", "b", "a", "b"])).not_to be_nil
+    end
+  end
+end

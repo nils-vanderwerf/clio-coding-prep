@@ -113,3 +113,23 @@ def valid_matter_ref?(ref)
   parts[1].match?(/\A[0-9]{4}\z/) &&
   parts[2].match?(/\A[0-9]{3}\z/)
 end
+
+# ─────────────────────────────────────────────
+# Exercise 7 — Most Frequent Element
+# ─────────────────────────────────────────────
+# Return the most frequently occurring element in the array.
+# Return nil if the array is empty.
+#
+# most_frequent(["a", "b", "c", "b", "e"])
+# => "b"
+#
+# most_frequent([])
+# => nil
+
+def most_frequent(arr)
+  counts = arr.each_with_object(Hash.new(0)) do |element, counts|
+    counts[element] += 1
+  end
+  return nil if counts.empty?
+  counts.max_by { |k, v| v }.first
+end
