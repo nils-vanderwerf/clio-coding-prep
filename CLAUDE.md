@@ -206,13 +206,3 @@ def greet(name = "stranger")
 p object        # calls .inspect — shows full structure, great for debugging
 puts object     # calls .to_s — human readable
 ```
-
----
-
-## Before You Type — The Checklist
-
-1. Restate the problem out loud in your own words
-2. Ask about edge cases: empty input? nil? negative numbers? duplicates?
-3. Say your approach before writing a single line
-4. Write the method signature first
-5. Get it working, then say "this works — I'd refactor X in production"
